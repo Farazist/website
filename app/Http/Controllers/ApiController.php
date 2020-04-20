@@ -20,6 +20,7 @@ use App\TicketMessage;
 use SoapClient;
 use SoapFault;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ApiController extends Controller
 {     
@@ -46,9 +47,11 @@ class ApiController extends Controller
 
     function sendQrcode(Request $request)
     {
+        $data = $request['data'];
 
+        return $data;
     }
-
+    
     function signInUser(Request $request)
     {
         $valid_request = $request->validate([
@@ -56,9 +59,11 @@ class ApiController extends Controller
             'password' => 'required',
         ]);
 
+        $valid_request['mobile_number'] = str_replace(' ', '', $valid_request['mobile_number']);
+
         if(Auth::attempt(['mobile_number' => $valid_request['mobile_number'], 'password' => $valid_request['password']]))
         {
-            $user = User::with('systems.city', 'systems.work_times', 'system.city', 'system.work_times')->where('id', Auth::user()->id)->get()->first();
+            $user = User::with('city', 'city.province', 'systems.city', 'systems.city.province', 'systems.work_times', 'system.city', 'system.city.province', 'system.work_times')->where('id', Auth::user()->id)->get()->first();
             $user->access_token = $user->createToken('authToken')->accessToken;
             return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
         }
@@ -66,13 +71,27 @@ class ApiController extends Controller
 
     function getTargetUser(Request $request)
     {
-        $user = User::select('id', 'name')->where('mobile_number', $request['mobile_number'])->get()->first();
-        return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
+        $user = User::find($request['id']);
+
+        if($user->role == 2)
+        {
+            $result = User::select('name', 'mobile_number')->find($request['id']);
+        }
+        else if($user->role == 3)
+        {
+            $result = User::select('name')->find($request['id']);
+        }
+        else
+        {
+            $result = null;
+        }
+        
+        return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
     }
 
     function getUser(Request $request)
     {
-        $user = User::with('systems.city', 'systems.work_times', 'system.city', 'system.work_times')->where('id', auth()->guard('api')->user()->id)->first();
+        $user = User::with('city', 'city.province', 'systems.city', 'systems.city.province', 'systems.work_times', 'system.city', 'system.city.province', 'system.work_times')->where('id', auth()->guard('api')->user()->id)->first();
         return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
     }
      
@@ -122,12 +141,38 @@ class ApiController extends Controller
 
         if ($request->has('address')) 
         {
-            $user->address = $request['address'];            
+            $user->address = $request['address'];
+        }
+
+        if ($request->has('city_id')) 
+        {
+            $user->city_id = $request['city_id'];
+        }
+
+        if($request->file('image') != null)
+        {
+            $image = $request->file('image');
+            $image_name = '/images/user/' . date("Y-m-d-H-i-s", time()) . '.jpg';
+            Storage::disk('public')->putFileAs('/', $image, $image_name);
+            $user->image = $image_name;
         }
 
         $user->save();
 
         return $this->signInUser($request);
+    }
+
+    function deleteUserImage(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+
+        if(Storage::disk('public')->has($user->image))
+            Storage::disk('public')->delete($user->image);
+
+        $user->image = "";
+        $user->update();
+
+        return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
     }
 
     function editUser(Request $request)
@@ -141,7 +186,12 @@ class ApiController extends Controller
 
         if ($request->has('address')) 
         {
-            $user->address = $request['address'];            
+            $user->address = $request['address'];
+        }
+
+        if ($request->has('city_id')) 
+        {
+            $user->city_id = $request['city_id'];
         }
         
         if ($request->has('email')) 
@@ -159,6 +209,14 @@ class ApiController extends Controller
             $user->system_id = $request['system_id'];            
         }
 
+        if($request->file('image') != null)
+        {
+            $image = $request->file('image');
+            $image_name = '/images/user/' . date("Y-m-d-H-i-s", time()) . '.jpg';
+            Storage::disk('public')->putFileAs('/', $image, $image_name);
+            $user->image = $image_name;
+        }
+
         $user->update();
 
         return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
@@ -166,22 +224,28 @@ class ApiController extends Controller
 
     function changeUserPassword(Request $request)
     {
-        $delivery->user_id = $request['user_id'];
-        
-        $user = auth()->guard('api')->user();
+        $user = User::where('mobile_number', $request['mobile_number'])->first();
 
-        $new_password = rand(1000, 9999);
+        if(!$user) //null
+        {
+            return 0;
+        }
+        else
+        {
+            $new_password = rand(1000, 9999);
 
-        $user->password = bcrypt($new_password);
-        $user->update();
-
-        return $this->sendSMS($user->mobile_number, "m3l043bhai", array( "user_id" => $user->id, "new_password" => $new_password));
+            $user->password = bcrypt($new_password);
+            $user->update();
+    
+            $this->sendSMS($user->mobile_number, "m3l043bhai", array( "user_id" => $user->id, "new_password" => $new_password));
+            return 1;
+        }
     }
     
     function getUserTransactions(Request $request)
     {
         $user_id = auth()->guard('api')->user()->id;
-        $result = Transaction::with('target_user')->where('user_id', $user_id)->get();
+        $result = Transaction::with('target_user')->where('user_id', $user_id)->orderBy('created_at', 'DESC')->get();
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
@@ -197,22 +261,26 @@ class ApiController extends Controller
 
     function getUserDeliveries(Request $request)
     {
-        $user_id = auth()->guard('api')->user()->id;
-        $result = Delivery::with('system.owner', 'system.city', 'items')->where('user_id', $user_id)->orderBy('created_at', 'DESC')->get();
+        $result = Delivery::with('city', 'city.province', 'system.owner', 'system.city', 'system.city.province', 'items')
+        ->where('user_id', auth()->guard('api')->user()->id)
+        ->where('state', '!=', 'waiting')
+        ->where('state', '!=', 'accepted')
+        ->orderBy('created_at', 'DESC')->get();
+
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     function getLastUserDelivery(Request $request)
     {
         $user_id = auth()->guard('api')->user()->id;
-        $result = Delivery::with('system.owner', 'system.city', 'items')->where('user_id', $user_id)->orderBy('created_at', 'DESC')->first();
+        $result = Delivery::with('city', 'city.province', 'system.owner', 'system.city', 'system.city.province', 'items')->where('user_id', $user_id)->orderBy('created_at', 'DESC')->first();
         
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
      
     function getSystemDeliveries(Request $request)
     {
-        $result = Delivery::with('items', 'user')->where('system_id', $request['id'])->orderBy('created_at', 'DESC')->get();
+        $result = Delivery::with('city', 'city.province', 'items', 'user')->where('system_id', $request['id'])->orderBy('created_at', 'DESC')->get();
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
@@ -253,15 +321,53 @@ class ApiController extends Controller
 
     function addTicketMessage(Request $request)
     {
-        $user_id = auth()->guard('api')->user()->id;
+        $ticket = Ticket::find($request['ticket_id']);
         
-        $ticket_message = new TicketMessage();
-        $ticket_message->text = $request['text'];
-        $ticket_message->type = $request['type'];
-        $ticket_message->ticket_id = $request['ticket_id'];
-        $ticket_message->save();
+        if($ticket->state == 'open')
+        {
+            $ticket_message = new TicketMessage();
+            $ticket_message->type = $request['type'];
+            $ticket_message->ticket_id = $request['ticket_id'];
+            
+            if ($request->has('text')) 
+            {
+                $ticket_message->text = $request['text'];
+            }
 
-        return response()->json($ticket_message, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+            if($request->file('image') != null)
+            {
+                $image = $request->file('image');
+                $image_name = '/images/ticket/' . date("Y-m-d-H-i-s", time()) . '.jpg';
+                Storage::disk('public')->putFileAs('/', $image, $image_name);
+                $ticket_message->image = $image_name;
+            }
+            
+            $ticket_message->save();
+    
+            return response()->json($ticket_message, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function editTicketMessages(Request $request)
+    {
+        $ticket = Ticket::find($request['ticket_id']);
+
+        foreach($ticket->items as $item)
+        {
+            $item->state = "seen";
+            $item->update();
+        }
+        return response()->json($ticket, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+    }
+
+    function getNewTicketMessagesCount(Request $request)
+    {
+        $result = 0;
+        foreach(auth()->guard('api')->user()->tickets as $ticket)
+        {
+            $result += $ticket->messages()->where('type','receive')->where('state','unseen')->count();
+        }
+        return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     function transfer(Request $request)
@@ -380,8 +486,34 @@ class ApiController extends Controller
 
     function getItems(Request $request)
     {
-        $result = Item::all();
+        $user = auth()->guard('api')->user();
+
+        if($user != null && $user->role == 2) // owner
+        {
+            $result = $user->items;
+        }
+        else if($user != null && $user->role == 3) // citizen
+        {
+            $result = $user->system->owner->items;
+        }
+        else // not login
+        {
+            $result = Item::where('owner_id', '0')->get();
+        }
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
+    }
+
+    function editItems(Request $request)
+    {
+        foreach($request['items'] as $request_item)
+        {
+            $item = Item::find($request_item['id']);
+            $item->name = $request_item['name'];
+            $item->price = $request_item['price'];
+            $item->enable = $request_item['enable'];
+
+            $item->update();
+        }
     }
 
     function getCategories(Request $request)
@@ -398,9 +530,13 @@ class ApiController extends Controller
 
     function getSystemSliders(Request $request)
     {
-        $result = System::find($request['system_id'])->sliders;
+        $system = System::find($request['system_id']);
 
-        if($result->count() == 0)
+        if($system != null && $system->sliders->count() > 0)
+        {
+            $result = $system->sliders;
+        }
+        else
         {
             $result = Slider::where('system_id', '0')->get();
         }
@@ -419,16 +555,65 @@ class ApiController extends Controller
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
     }
 
+    function deleteSystemImage(Request $request)
+    {
+        $system = System::find($request['id']);
+
+        if(Storage::disk('public')->has($system->image))
+            Storage::disk('public')->delete($system->image);
+
+        $system->image = "";
+        $system->update();
+
+        return response()->json($system, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
+    }
+
     function editSystem(Request $request)
     {
         $system = System::find($request['id']);
 
         if ($system) 
         {
-            if ($request->has('state')) 
+            if($request->file('image') != null)
             {
-                $system->state = $request['state'];            
+                $image = $request->file('image');
+                $image_name = '/images/system/' . date("Y-m-d-H-i-s", time()) . '.jpg';
+                Storage::disk('public')->putFileAs('/', $image, $image_name);
+                $system->image = $image_name;
             }
+
+            if ($request->has('activation_type')) 
+            {
+                $system->activation_type = $request['activation_type'];
+
+                if($request['activation_type'] == "auto")
+                {
+                    if($request->has('morning_start_time'))
+                    {
+                        $system->morning_start_time = $request['morning_start_time']; 
+                    }
+                    if($request->has('morning_end_time'))
+                    {
+                        $system->morning_end_time = $request['morning_end_time']; 
+                    }
+                    if($request->has('afternoon_start_time'))
+                    {
+                        $system->afternoon_start_time = $request['afternoon_start_time']; 
+                    }
+                    if($request->has('afternoon_end_time'))
+                    {
+                        $system->afternoon_end_time = $request['afternoon_end_time']; 
+                    }
+                }
+                else if($request['activation_type'] == "manual")
+                {
+                    if($request->has('state'))
+                    {
+                        $system->state = $request['state'];   
+                    }
+                }         
+            }
+
             $system->update();
             return response()->json($system, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
         }
@@ -448,10 +633,30 @@ class ApiController extends Controller
             $delivery->system_id = $request['system_id'];            
         }
 
+        if ($request->has('city_id')) 
+        {
+            $delivery->city_id = $request['city_id'];            
+        } 
+
         if ($request->has('state')) 
         {
             $delivery->state = $request['state'];            
         } 
+
+        if ($request->has('undefined_items_name')) 
+        {
+            $delivery->undefined_items_name = $request['undefined_items_name'];            
+        }
+
+        if ($request->has('undefined_items_weight')) 
+        {
+            $delivery->undefined_items_weight = $request['undefined_items_weight'];            
+        }
+
+        if ($request->has('undefined_items_price')) 
+        {
+            $delivery->undefined_items_price = $request['undefined_items_price'];            
+        }
 
         if ($request->has('seen')) 
         {
@@ -492,16 +697,34 @@ class ApiController extends Controller
             $delivery->address = $request['address'];            
         }
 
+        if ($request->has('city_id')) 
+        {
+            $delivery->city_id = $request['city_id'];            
+        } 
+
         if ($request->has('state')) 
         {
             $delivery->state = $request['state'];            
         }
 
+        if ($request->has('undefined_items_name')) 
+        {
+            $delivery->undefined_items_name = $request['undefined_items_name'];            
+        }
+
+        if ($request->has('undefined_items_weight')) 
+        {
+            $delivery->undefined_items_weight = $request['undefined_items_weight'];            
+        }
+
         $delivery->save();
 
-        foreach($request['items'] as $item)
+        if ($request->has('items')) 
         {
-            $delivery->items()->attach([$item['id'] => ['count'=> $item['count']]]);
+            foreach($request['items'] as $item)
+            {
+                $delivery->items()->attach([$item['id'] => ['count'=> $item['count']]]);
+            }
         }
 
         return response()->json($delivery, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 

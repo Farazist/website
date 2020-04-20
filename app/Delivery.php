@@ -20,4 +20,14 @@ class Delivery extends Model
 	{
 		return $this->belongsTo('App\System')->withDefault();
 	}
+	
+	public function city()
+	{
+		return $this->belongsTo('App\City')->withDefault([]);
+    }
+    
+    public function province()
+	{
+		return $this->belongsTo('App\Province')->withDefault([]);
+	}
 }

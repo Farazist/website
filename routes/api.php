@@ -33,8 +33,10 @@ Route::post('/get-province-cities', 'ApiController@getProvinceCities');
 Route::post('/get-provinces', 'ApiController@getProvinces');
 
 Route::group(['middleware' => 'auth:api'], function () {
+
     Route::post('/send-qrcode', 'ApiController@sendQrcode');
     Route::post('/get-user', 'ApiController@getUser');
+    Route::post('/delete-user-image', 'ApiController@deleteUserImage');
     Route::post('/edit-user', 'ApiController@editUser');
     Route::post('/get-target-user', 'ApiController@getTargetUser');
     Route::post('/get-user-deliveries', 'ApiController@getUserDeliveries');
@@ -47,14 +49,18 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/get-ticket-groups', 'ApiController@getTicketGroups');
     Route::post('/add-ticket', 'ApiController@addTicket');
     Route::post('/add-ticket-message', 'ApiController@addTicketMessage');
+    Route::post('/edit-ticket-messages', 'ApiController@editTicketMessages');
+    Route::post('/get-new-ticket-messages-count', 'ApiController@getNewTicketMessagesCount');
     Route::post('/transfer', 'ApiController@transfer');
     Route::post('/transfer-secure', 'ApiController@transferSecure');
     Route::post('/get-faqs', 'ApiController@getFaqs');
+    Route::post('/edit-items', 'ApiController@editItems');
     Route::post('/get-informations', 'ApiController@getInformations');
     Route::post('/get-sliders', 'ApiController@getSliders');
     Route::post('/get-system-sliders', 'ApiController@getSystemSliders');
     Route::post('/get-systems', 'ApiController@getSystems');
     Route::post('/get-system', 'ApiController@getSystem');
+    Route::post('/delete-system-image', 'ApiController@deleteSystemImage');
     Route::post('/edit-system', 'ApiController@editSystem');
     Route::post('/add-new-delivery', 'ApiController@addNewDelivery');
     Route::post('/edit-delivery', 'ApiController@editDelivery');

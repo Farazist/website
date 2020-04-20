@@ -34,15 +34,30 @@ class User extends Authenticatable
 	{
 		return $this->hasMany('App\Item', 'owner_id', 'id');
 	}
-
+    
     public function system()
 	{
 		return $this->belongsTo('App\System')->withDefault([]);
+    }
+    
+    public function city()
+	{
+		return $this->belongsTo('App\City')->withDefault([]);
+    }
+    
+    public function province()
+	{
+		return $this->belongsTo('App\Province')->withDefault([]);
 	}
 
     public function messages()
     {
         return $this->hasMany('App\Message');
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany('App\Ticket');
     }
     
     /**
