@@ -30,4 +30,9 @@ class System extends Model
 	{
 		return $this->hasMany('App\WorkTime');
 	}
+
+	public function deliveries()
+	{
+		return $this->hasMany('App\Delivery');
+	}
 }

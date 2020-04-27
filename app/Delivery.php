@@ -13,7 +13,12 @@ class Delivery extends Model
 	
 	public function items()
     {
-        return $this->belongsToMany('App\Item')->withPivot('count');;
+        return $this->belongsToMany('App\Item')->withPivot('count');
+	}
+
+	public function custom_items()
+    {
+        return $this->hasMany('App\CustomItem');
 	}
 	
     public function system()

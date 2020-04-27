@@ -7,6 +7,7 @@ use App\User;
 use App\Transaction;
 use App\Delivery;
 use App\Item;
+use App\CustomItem;
 use App\System;
 use App\Faq;
 use App\Information;
@@ -17,13 +18,23 @@ use App\City;
 use App\Ticket;
 use App\TicketGroup;
 use App\TicketMessage;
+use App\AndroidAppVersion;
 use SoapClient;
 use SoapFault;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class ApiController extends Controller
-{     
+{
+    function getLastAndroidAppVersion()
+    {
+        $result = AndroidAppVersion::orderBy('created_at', 'DESC')->first();
+        return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
+    }
+
     function socket()
     {
         echo 'connect';
@@ -45,11 +56,51 @@ class ApiController extends Controller
         socket_close($socket);
     }
 
-    function sendQrcode(Request $request)
+    function sendQrcodeSignInToken(Request $request)
     {
-        $data = $request['data'];
+        try 
+        {
+            $user = auth()->guard('api')->user();
+            $decrypted = Crypt::decryptString($request['qrcode_signin_token']);
+            $system = System::find($decrypted);
+            $system->qrcode_signin_token = $request['qrcode_signin_token'];
+            $system->qrcode_signin_user_id = $user->id;
+            $system->update();
+            return 1;    
+        } 
+        catch (DecryptException $e) 
+        {
+            return 0;
+        }
+    }
+    
+    function makeQrcodeSignInToken(Request $request)
+    {
+        $encrypted = Crypt::encryptString($request['system_id']);
+        return $encrypted;
+    }
 
-        return $data;
+    function checkQrcodeSignInToken(Request $request)
+    {
+        try 
+        {
+            $decrypted = Crypt::decryptString($request['qrcode_signin_token']);
+            $system = System::find($decrypted);
+    
+            if($system->qrcode_signin_token == $request['qrcode_signin_token'])
+            {
+                $user = User::find($system->qrcode_signin_user_id);
+                Auth::login($user);
+                $user = User::with('city', 'city.province', 'systems.city', 'systems.city.province', 'systems.work_times', 'system.city', 'system.city.province', 'system.work_times')->where('id', Auth::user()->id)->get()->first();
+                $user->access_token = $user->createToken('authToken')->accessToken;
+                return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+            }
+        } 
+        catch (DecryptException $e) 
+        {
+        //
+        }
+        return 0;
     }
     
     function signInUser(Request $request)
@@ -73,11 +124,11 @@ class ApiController extends Controller
     {
         $user = User::find($request['id']);
 
-        if($user->role == 2)
+        if($user != null && $user->role == 2)
         {
             $result = User::select('name', 'mobile_number')->find($request['id']);
         }
-        else if($user->role == 3)
+        else if($user != null && ($user->role == 3 || $user->role == 1))
         {
             $result = User::select('name')->find($request['id']);
         }
@@ -189,7 +240,7 @@ class ApiController extends Controller
             $user->address = $request['address'];
         }
 
-        if ($request->has('city_id')) 
+        if ($request->has('city_id') && City::find($request['city_id'])) 
         {
             $user->city_id = $request['city_id'];
         }
@@ -204,7 +255,7 @@ class ApiController extends Controller
             $user->password = bcrypt($request['password']);            
         } 
 
-        if ($request->has('system_id')) 
+        if ($request->has('system_id') && System::find($request['system_id'])) 
         {
             $user->system_id = $request['system_id'];            
         }
@@ -249,19 +300,16 @@ class ApiController extends Controller
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
-    function getOwnerCitizensCount(Request $request)
+    function getSystemCitizensCount(Request $request)
     {
-        $result = 0;
-        foreach(auth()->guard('api')->user()->systems as $system)
-        {
-            $result += $system->citizens()->count();
-        }
+        $system = System::find($request['system_id']);
+        $result = $system->citizens()->count();
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     function getUserDeliveries(Request $request)
     {
-        $result = Delivery::with('city', 'city.province', 'system.owner', 'system.city', 'system.city.province', 'items')
+        $result = Delivery::with('city', 'city.province', 'system.owner', 'system.city', 'system.city.province', 'items', 'custom_items')
         ->where('user_id', auth()->guard('api')->user()->id)
         ->where('state', '!=', 'waiting')
         ->where('state', '!=', 'accepted')
@@ -273,14 +321,21 @@ class ApiController extends Controller
     function getLastUserDelivery(Request $request)
     {
         $user_id = auth()->guard('api')->user()->id;
-        $result = Delivery::with('city', 'city.province', 'system.owner', 'system.city', 'system.city.province', 'items')->where('user_id', $user_id)->orderBy('created_at', 'DESC')->first();
+        $result = Delivery::with('city', 'city.province', 'system.owner', 'system.city', 'system.city.province', 'items', 'custom_items')->where('user_id', $user_id)->orderBy('created_at', 'DESC')->first();
         
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
      
     function getSystemDeliveries(Request $request)
     {
-        $result = Delivery::with('city', 'city.province', 'items', 'user')->where('system_id', $request['id'])->orderBy('created_at', 'DESC')->get();
+        $result = Delivery::with('city', 'city.province', 'items', 'custom_items', 'user')->where('system_id', $request['id'])->orderBy('created_at', 'DESC')->get();
+        return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+    }
+
+    function getSystemDeliveriesCount(Request $request)
+    {
+        $system = System::find($request['system_id']);
+        $result = $system->deliveries->whereIn('state', array('accepted', 'waiting'))->count();
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
@@ -289,20 +344,23 @@ class ApiController extends Controller
         $user_id = auth()->guard('api')->user()->id;
         $result = Ticket::with('group')->where('user_id', $user_id)->orderBy('created_at', 'DESC')->get();
         
+        foreach($result as $ticket)
+        {
+            $ticket['new_ticket_messages_count'] = $ticket->messages()->where('type','receive')->where('state','unseen')->count();
+        }
+
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     function getTicketMessages(Request $request)
     {
         $result = Ticket::find($request['ticket_id'])->messages;
-        
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     function getTicketGroups(Request $request)
     {
         $result = TicketGroup::all();
-        
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
@@ -352,10 +410,13 @@ class ApiController extends Controller
     {
         $ticket = Ticket::find($request['ticket_id']);
 
-        foreach($ticket->items as $item)
+        foreach($ticket->messages as $ticket_message)
         {
-            $item->state = "seen";
-            $item->update();
+            if($ticket_message->type == 'receive')
+            {
+                $ticket_message->state = "seen";
+                $ticket_message->update();
+            }
         }
         return response()->json($ticket, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
@@ -414,43 +475,38 @@ class ApiController extends Controller
 
     function transferSecure(Request $request)
     {
-        $sender = System::find($request['system_id'])->owner()->id;
-        $receiver = auth()->guard('api')->user();
-        
-        if(!$sender || !$receiver)
+        if($request->has('APP_KEY') && env('APP_KEY') == $request['APP_KEY'])
         {
-            return "0";
-        }
-        elseif($sender->wallet - $request['amount'] < 0)
-        {
-            return "00";
-        }
-        else
-        {
-            $sender->wallet -= $request['amount'];
-            $sender->update();
+            $sender = System::find($request['system_id'])->owner;
+            $receiver = auth()->guard('api')->user();
             
-            $receiver->wallet += $request['amount'];
-            $receiver->update();
+            if($sender != null && $receiver != null && $sender->wallet - $request['amount'] >= 0)
+            {
+                $sender->wallet -= $request['amount'];
+                $sender->update();
+                
+                $receiver->wallet += $request['amount'];
+                $receiver->update();
 
-            $transaction = new Transaction();
-            $transaction->user_id = $sender->id;
-            $transaction->target_user_id = $receiver->id;
-            $transaction->amount = -$request['amount'];
-            if ($request->has('description')) $transaction->description = $request['description'];
-            $transaction->save();
+                $transaction = new Transaction();
+                $transaction->user_id = $sender->id;
+                $transaction->target_user_id = $receiver->id;
+                $transaction->amount = -$request['amount'];
+                if ($request->has('description')) $transaction->description = $request['description'];
+                $transaction->save();
 
-            $transaction = new Transaction();
-            $transaction->user_id = $receiver->id;
-            $transaction->target_user_id = $sender->id;
-            $transaction->amount = $request['amount'];
-            if ($request->has('description')) $transaction->description = $request['description'];
-            $transaction->save();
+                $transaction = new Transaction();
+                $transaction->user_id = $receiver->id;
+                $transaction->target_user_id = $sender->id;
+                $transaction->amount = $request['amount'];
+                if ($request->has('description')) $transaction->description = $request['description'];
+                $transaction->save();
 
-            $this->sendSMS($sender->mobile_number, "6iawhe3ig8", array( "sender_id" => $sender->id, "amount" => $request['amount'], "wallet" => $sender->wallet));
-            $this->sendSMS($receiver->mobile_number, "6nr93842ew", array( "receiver_id" => $receiver->id, "amount" => $request['amount'], "wallet" => $receiver->wallet));
+                $this->sendSMS($sender->mobile_number, "6iawhe3ig8", array( "sender_id" => $sender->id, "amount" => $request['amount'], "wallet" => $sender->wallet));
+                $this->sendSMS($receiver->mobile_number, "6nr93842ew", array( "receiver_id" => $receiver->id, "amount" => $request['amount'], "wallet" => $receiver->wallet));
 
-            return "1";
+                return response()->json($transaction, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+            }
         }
     }
 
@@ -486,7 +542,14 @@ class ApiController extends Controller
 
     function getItems(Request $request)
     {
-        $user = auth()->guard('api')->user();
+        if($request->has('user_id'))
+        {
+            $user = User::find($request['user_id']);
+        }
+        else
+        {
+            $user = auth()->guard('api')->user();
+        }
 
         if($user != null && $user->role == 2) // owner
         {
@@ -508,10 +571,20 @@ class ApiController extends Controller
         foreach($request['items'] as $request_item)
         {
             $item = Item::find($request_item['id']);
-            $item->name = $request_item['name'];
-            $item->price = $request_item['price'];
-            $item->enable = $request_item['enable'];
 
+            if(array_key_exists('name', $request_item))
+            {
+                $item->name = $request_item['name'];
+            }
+            if(array_key_exists('price', $request_item))
+            {
+                $item->price = $request_item['price'];
+            }
+            if(array_key_exists('enable', $request_item))
+            {
+                $item->enable = $request_item['enable'];
+            }
+            
             $item->update();
         }
     }
@@ -624,62 +697,57 @@ class ApiController extends Controller
         $delivery = Delivery::find($request['id']);
 
         if ($request->has('address')) 
-        {
             $delivery->address = $request['address'];            
-        }
         
         if ($request->has('system_id')) 
-        {
             $delivery->system_id = $request['system_id'];            
-        }
 
         if ($request->has('city_id')) 
-        {
             $delivery->city_id = $request['city_id'];            
-        } 
 
         if ($request->has('state')) 
-        {
             $delivery->state = $request['state'];            
-        } 
-
-        if ($request->has('undefined_items_name')) 
-        {
-            $delivery->undefined_items_name = $request['undefined_items_name'];            
-        }
-
-        if ($request->has('undefined_items_weight')) 
-        {
-            $delivery->undefined_items_weight = $request['undefined_items_weight'];            
-        }
-
-        if ($request->has('undefined_items_price')) 
-        {
-            $delivery->undefined_items_price = $request['undefined_items_price'];            
-        }
 
         if ($request->has('seen')) 
-        {
             $delivery->seen = $request['seen'];            
-        } 
 
         if ($request->has('description')) 
-        {
             $delivery->description = $request['description'];            
-        } 
 
         $delivery->update();
 
         if ($request->has('items')) 
         {
             foreach($delivery->items as $item)
-            {
                 $delivery->items()->detach($item->id);
-            }
 
             foreach($request['items'] as $item)
-            {
                 $delivery->items()->attach([$item['id'] => ['count'=> $item['count']]]);
+        }
+
+        if ($request->has('custom_items')) 
+        {
+            foreach($delivery->custom_items as $item)
+                $item->delete();
+
+            foreach($request['custom_items'] as $item)
+            {
+                $custom_item = new CustomItem();
+                $custom_item->delivery_id = $delivery['id'];
+
+                if(array_key_exists('name', $item))
+                    $custom_item->name = $item['name'];
+
+                if(array_key_exists('weight', $item))
+                    $custom_item->weight = $item['weight'];
+
+                if(array_key_exists('count', $item))
+                    $custom_item->count = $item['count'];
+
+                if(array_key_exists('price', $item))
+                    $custom_item->price = $item['price'];
+
+                $custom_item->save();
             }
         }
 
@@ -707,16 +775,6 @@ class ApiController extends Controller
             $delivery->state = $request['state'];            
         }
 
-        if ($request->has('undefined_items_name')) 
-        {
-            $delivery->undefined_items_name = $request['undefined_items_name'];            
-        }
-
-        if ($request->has('undefined_items_weight')) 
-        {
-            $delivery->undefined_items_weight = $request['undefined_items_weight'];            
-        }
-
         $delivery->save();
 
         if ($request->has('items')) 
@@ -724,6 +782,37 @@ class ApiController extends Controller
             foreach($request['items'] as $item)
             {
                 $delivery->items()->attach([$item['id'] => ['count'=> $item['count']]]);
+            }
+        }
+
+        if ($request->has('custom_items')) 
+        {
+            foreach($request['custom_items'] as $item)
+            {
+                $custom_item = new CustomItem();
+                $custom_item->delivery_id = $delivery['id'];
+
+                if(array_key_exists('name', $item))
+                {
+                    $custom_item->name = $item['name'];
+                }
+
+                if(array_key_exists('weight', $item))
+                {
+                    $custom_item->weight = $item['weight'];
+                }
+
+                if(array_key_exists('count', $item))
+                {
+                    $custom_item->count = $item['count'];
+                }
+
+                if(array_key_exists('price', $item))
+                {
+                    $custom_item->price = $item['price'];
+                }
+
+                $custom_item->save();
             }
         }
 
