@@ -106,17 +106,30 @@ class ApiController extends Controller
     function signInUser(Request $request)
     {
         $valid_request = $request->validate([
-            'mobile_number' => 'required',
+            'mobile_number' => 'required_without_all:id',
+            'id' => 'required_without_all:mobile_number',
             'password' => 'required',
         ]);
 
-        $valid_request['mobile_number'] = str_replace(' ', '', $valid_request['mobile_number']);
-
-        if(Auth::attempt(['mobile_number' => $valid_request['mobile_number'], 'password' => $valid_request['password']]))
+        if($request->has('mobile_number'))
         {
-            $user = User::with('city', 'city.province', 'systems.city', 'systems.city.province', 'systems.work_times', 'system.city', 'system.city.province', 'system.work_times')->where('id', Auth::user()->id)->get()->first();
-            $user->access_token = $user->createToken('authToken')->accessToken;
-            return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
+            $valid_request['mobile_number'] = str_replace(' ', '', $valid_request['mobile_number']);
+
+            if(Auth::attempt(['mobile_number' => $valid_request['mobile_number'], 'password' => $valid_request['password']]))
+            {
+                $user = User::with('city', 'city.province', 'systems.city', 'systems.city.province', 'systems.work_times', 'system.city', 'system.city.province', 'system.work_times')->where('id', Auth::user()->id)->get()->first();
+                $user->access_token = $user->createToken('authToken')->accessToken;
+                return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
+            }
+        }
+        elseif($request->has('id'))
+        {
+            if(Auth::attempt(['id' => $valid_request['id'], 'password' => $valid_request['password']]))
+            {
+                $user = User::with('city', 'city.province', 'systems.city', 'systems.city.province', 'systems.work_times', 'system.city', 'system.city.province', 'system.work_times')->where('id', Auth::user()->id)->get()->first();
+                $user->access_token = $user->createToken('authToken')->accessToken;
+                return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
+            }
         }
     }
 
@@ -210,6 +223,8 @@ class ApiController extends Controller
 
         $user->save();
 
+        $this->sendSMS($user->mobile_number, "o7ln3ebxwe", array("name" => $user->name));
+
         return $this->signInUser($request);
     }
 
@@ -252,8 +267,13 @@ class ApiController extends Controller
 
         if ($request->has('password')) 
         {
-            $user->password = bcrypt($request['password']);            
-        } 
+            $user->password = bcrypt($request['password']);
+            
+            foreach($user->tokens as $token) 
+            {
+                $token->revoke();   
+            }
+        }
 
         if ($request->has('system_id') && System::find($request['system_id'])) 
         {
@@ -284,11 +304,15 @@ class ApiController extends Controller
         else
         {
             $new_password = rand(1000, 9999);
-
             $user->password = bcrypt($new_password);
             $user->update();
     
             $this->sendSMS($user->mobile_number, "m3l043bhai", array( "user_id" => $user->id, "new_password" => $new_password));
+            
+            foreach($user->tokens as $token) 
+            {
+                $token->revoke();   
+            }
             return 1;
         }
     }
@@ -436,15 +460,7 @@ class ApiController extends Controller
         $sender = auth()->guard('api')->user();
         $receiver = User::where('id', $request['target_user_id'])->get()->first();
         
-        if(!$sender || !$receiver)
-        {
-            return "0";
-        }
-        elseif($sender->wallet - $request['amount'] < 0)
-        {
-            return "00";
-        }
-        else
+        if($sender && $receiver && $sender->wallet - $request['amount'] >= 0)
         {
             $sender->wallet -= $request['amount'];
             $sender->update();
@@ -459,6 +475,14 @@ class ApiController extends Controller
             if ($request->has('description')) $transaction->description = $request['description'];
             $transaction->save();
 
+            $this->sendSMS($sender->mobile_number, "4jajlb1m61", array(
+                "sender_id" => $sender->id, 
+                "amount" => $request['amount'], 
+                "wallet" => $sender->wallet,
+                "transaction_id" => $transaction->id,
+                "date" => jdate('Y/m/j', strtotime($transaction->created_at))
+            ));
+            
             $transaction = new Transaction();
             $transaction->user_id = $receiver->id;
             $transaction->target_user_id = $sender->id;
@@ -466,47 +490,19 @@ class ApiController extends Controller
             if ($request->has('description')) $transaction->description = $request['description'];
             $transaction->save();
 
-            $this->sendSMS($sender->mobile_number, "6iawhe3ig8", array( "sender_id" => $sender->id, "amount" => $request['amount'], "wallet" => $sender->wallet));
-            $this->sendSMS($receiver->mobile_number, "6nr93842ew", array( "receiver_id" => $receiver->id, "amount" => $request['amount'], "wallet" => $receiver->wallet));
+            $this->sendSMS($receiver->mobile_number, "pdzrmkhfih", array(
+                "receiver_id" => $receiver->id, 
+                "amount" => $request['amount'], 
+                "wallet" => $receiver->wallet,
+                "transaction_id" => $transaction->id,
+                "date" => jdate('Y/m/j', strtotime($transaction->created_at))
+            ));
 
-            return "1";
+            return 1;
         }
-    }
-
-    function transferSecure(Request $request)
-    {
-        if($request->has('APP_KEY') && env('APP_KEY') == $request['APP_KEY'])
+        else
         {
-            $sender = System::find($request['system_id'])->owner;
-            $receiver = auth()->guard('api')->user();
-            
-            if($sender != null && $receiver != null && $sender->wallet - $request['amount'] >= 0)
-            {
-                $sender->wallet -= $request['amount'];
-                $sender->update();
-                
-                $receiver->wallet += $request['amount'];
-                $receiver->update();
-
-                $transaction = new Transaction();
-                $transaction->user_id = $sender->id;
-                $transaction->target_user_id = $receiver->id;
-                $transaction->amount = -$request['amount'];
-                if ($request->has('description')) $transaction->description = $request['description'];
-                $transaction->save();
-
-                $transaction = new Transaction();
-                $transaction->user_id = $receiver->id;
-                $transaction->target_user_id = $sender->id;
-                $transaction->amount = $request['amount'];
-                if ($request->has('description')) $transaction->description = $request['description'];
-                $transaction->save();
-
-                $this->sendSMS($sender->mobile_number, "6iawhe3ig8", array( "sender_id" => $sender->id, "amount" => $request['amount'], "wallet" => $sender->wallet));
-                $this->sendSMS($receiver->mobile_number, "6nr93842ew", array( "receiver_id" => $receiver->id, "amount" => $request['amount'], "wallet" => $receiver->wallet));
-
-                return response()->json($transaction, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
-            }
+            return 0;
         }
     }
 
@@ -696,14 +692,14 @@ class ApiController extends Controller
     {
         $delivery = Delivery::find($request['id']);
 
-        if ($request->has('address')) 
-            $delivery->address = $request['address'];            
+        // if ($request->has('address')) 
+        //     $delivery->address = $request['address'];            
         
         if ($request->has('system_id')) 
             $delivery->system_id = $request['system_id'];            
 
-        if ($request->has('city_id')) 
-            $delivery->city_id = $request['city_id'];            
+        // if ($request->has('city_id')) 
+        //     $delivery->city_id = $request['city_id'];            
 
         if ($request->has('state')) 
             $delivery->state = $request['state'];            
@@ -816,12 +812,27 @@ class ApiController extends Controller
             }
         }
 
+        if($delivery->state == "waiting")
+            $this->sendSMS($delivery->system->owner->mobile_number, "d0timjuio8", array("user_id" => $delivery->system->owner->id));
+
         return response()->json($delivery, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
     }
      
     function verificationSMS(Request $request)
     {
-        return $this->sendSMS($request['mobile_number'], "esxf1rvim9", array( "code" => $request['code']));
+        return $this->sendSMS($request['mobile_number'], "lleybqnuz0", array( "code" => $request['code']));
+    }
+
+    function turnOnSystemSMS(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+        return $this->sendSMS($user->mobile_number, "kefy1r5cyn", array("user_id" => $user->id, "system_id" => $request['system_id']));
+    }
+
+    function turnOffSystemSMS(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+        return $this->sendSMS($user->mobile_number, "474v9v53lr", array("user_id" => $user->id, "system_id" => $request['system_id']));
     }
      
     private function sendSMS($mobile_number, $pattern_code, $input_data)

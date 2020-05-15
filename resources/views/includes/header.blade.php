@@ -7,7 +7,7 @@
     @endauth
 
     <a href="{{ url("/") }}" class="navbar-brand">
-        <img src="{{ url('/images/farazist - side text.svg') }}" height="40px" alt="Cultivation" />
+        <img src="{{ url('/images/logo.png') }}" height="40px" alt="farazist logo" />
     </a>
     <div class="order-md-2 order-1">
         <a href="#download-app" id="download-app" class="btn btn-success rounded-pill d-md-inline d-sm-block">

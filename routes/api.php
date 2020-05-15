@@ -69,4 +69,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/add-new-delivery', 'ApiController@addNewDelivery');
     Route::post('/edit-delivery', 'ApiController@editDelivery');
     Route::post('/delete-delivery', 'ApiController@deleteDelivery');
+    Route::post('/turn-on-system-sms', 'ApiController@turnOnSystemSMS');
+    Route::post('/turn-off-system-sms', 'ApiController@turnOffSystemSMS');
 });

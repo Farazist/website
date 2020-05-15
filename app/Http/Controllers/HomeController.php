@@ -14,6 +14,7 @@ use App\Category;
 use App\Partner;
 use App\Video;
 use App\Image;
+use App\Page;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -53,6 +54,14 @@ class HomeController extends Controller
             'partners' => $partners,
             'images' => $images,
             'topics' => $topics,
+        ]);
+    }
+
+    function help()
+    {
+        $page = Page::where('title', 'راهنما')->first();
+        return view('client.page')->with([
+            'page' => $page
         ]);
     }
 

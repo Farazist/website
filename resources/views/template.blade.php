@@ -13,8 +13,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="application-name" content="Farazist">
     <meta name="author" content="Sajjad Aemmi">
-    <meta name="description"
-        content="@yield('description', '')">
+    <meta name="description" content="@yield('description', '')">
     <meta name="keywords"
         content="@yield('keywords','بازیافت,بازیافت هوشمند,تحویل پسماند,شارژ ساختمان,بیمه,خیریه,ECO,RVM,شارژ سیم کارت,پرداخت قبض,تحویل پکیج')">
 
@@ -87,7 +86,7 @@
 <body class="bg-light">
     <div class="preloader_wrapper">
         <div class="preloader_inner">
-            <img src="{{ url('/images/farazist.svg') }}" width="64px" alt="image" />
+            <img src="{{ url('/images/logo.png') }}" width="64px" alt="farazist logo" />
         </div>
     </div>
     <div class="row">
@@ -131,15 +130,13 @@
     <script src="{{ url('/js/revolution.extension.video.min.js') }}"></script> --}}
     <script src="{{ url('/js/custom.js') }}"></script>
 
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="/__/firebase/7.8.2/firebase-app.js"></script>
-
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-     https://firebase.google.com/docs/web/setup#available-libraries -->
-    <script src="/__/firebase/7.8.2/firebase-analytics.js"></script>
-
-    <!-- Initialize Firebase -->
-    <script src="/__/firebase/init.js"></script>
+    <script>
+        ClassicEditor
+            .create( document.querySelector( '#editor' ) )
+            .catch( error => {
+                console.error( error );
+            } );
+    </script>
 </body>
 
 </html>

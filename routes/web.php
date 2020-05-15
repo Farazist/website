@@ -30,6 +30,7 @@ Route::get('/logout', 'HomeController@logout');
 Route::get('/', 'HomeController@index');
 Route::get('/about-us', 'HomeController@aboutUs');
 Route::get('/faq', 'FaqController@getAllForClient');
+Route::get('/help', 'HomeController@help');
 
 Route::post('/send-message', 'MessageController@AddPost');
 
@@ -82,6 +83,16 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
         Route::get('/', 'TopicController@getAllForAdmin');
     });
 
+    // Page
+    Route::group(['prefix' => '/pages',], function () {
+        Route::get('/add', 'PageController@AddGet');
+        Route::post('/add', 'PageController@AddPost');
+        Route::get('/edit/{id}', 'PageController@EditGet');
+        Route::post('/edit', 'PageController@EditPost');
+        Route::get('/delete/{id}', 'PageController@DeleteGet');
+        Route::get('/', 'PageController@AllGetForAdmin');
+    });
+    
     // Citizen
     Route::group(['prefix' => '/citizens',], function () {
         Route::get('/add', 'CitizenController@AddGet');
