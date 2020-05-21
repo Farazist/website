@@ -316,3 +316,17 @@ a:hover .btn-circle {
 .grecaptcha-badge {
     visibility: hidden;
 }
+
+.btn-group.special {
+    display: flex;
+}
+
+.special .btn {
+    flex: 1
+}
+
+.table td.fit,
+.table th.fit {
+    white-space: nowrap;
+    width: 1px;
+}

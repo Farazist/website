@@ -1,26 +1,26 @@
 <div class="clv_section mb-5" id="section-contact-us">
     <div class="container">
         <div class="row">
-            <div class="col-lg-7 text-white">
+            <div class="col-lg-6 text-white">
                 <p>
                     هفت روز هفته ، ۲۴ ساعت شبانه‌روز پاسخگوی شما هستیم
                 </p>
-                <h3 class="mt-4">
+                <h4 class="mt-4">
                     <span class="fad fa-phone fa-fw fa-lg"></span>
                     05135420483
-                </h3>
-                <h3 class="mt-4">
+                </h4>
+                <h4 class="mt-4">
                     <span class="fad fa-sms fa-fw fa-lg"></span>
                     09152525180 - 09152163545
-                </h3>
-                <h3 class="mt-4">
+                </h4>
+                <h4 class="mt-4">
                     <span class="fad fa-at fa-fw fa-lg"></span>
                     info@farazist.ir
-                </h3>
-                <h3 class="mt-4">
+                </h4>
+                <h4 class="mt-4">
                     <span class="fad fa-map-marker-alt fa-fw fa-lg"></span>
                     مشهد - بزرگراه آسیایی - ابتدای شهرک صنعتی توس - شرکت اقتصاد سبز فرامرزی
-                </h3>
+                </h4>
             </div>
             <div class="col-lg-5">
                 <form method="POST" action="{{ url("/send-message") }}">
@@ -41,6 +41,12 @@
                     <input name="recaptcha" id="recaptcha" type="hidden">
                     <button type="submit" class="btn btn-light btn-block rounded-pill">بفرست</button>
                 </form>
+            </div>
+            <div class="col-lg-1 justify-content-center pt-3">
+                <a target="_blank" href="https://trustseal.enamad.ir/?id=148613&amp;Code=rh2YPKTGiIJORKMYsQSp">
+                    <img src="https://Trustseal.eNamad.ir/logo.aspx?id=148613&amp;Code=rh2YPKTGiIJORKMYsQSp" alt=""
+                        style="cursor:pointer" id="rh2YPKTGiIJORKMYsQSp">
+                </a>
             </div>
         </div>
         <br>

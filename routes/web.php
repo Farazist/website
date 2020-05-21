@@ -93,13 +93,27 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
         Route::get('/', 'PageController@AllGetForAdmin');
     });
     
+    // Owner
+    Route::group(['prefix' => '/owners',], function () {
+        Route::get('/add', 'OwnerController@AddGet');
+        Route::post('/add', 'OwnerController@AddPost');
+        Route::get('/{owner_id}/edit', 'OwnerController@EditGet');
+        Route::post('/edit', 'OwnerController@EditPost');
+        Route::get('/{owner_id}/delete', 'OwnerController@DeleteGet');
+        Route::get('/{id}/transactions', 'OwnerController@getOwnerTransactions');
+        Route::get('/{id}/deliveries', 'OwnerController@getOwnerDeliveries');
+        Route::get('/{owner_id}/deliveries/{delivery_id}', 'OwnerController@getOwnerDeliveryItems');
+        Route::get('/{id}', 'OwnerController@SingleGet');
+        Route::get('/', 'OwnerController@getAllForAdmin');
+    });
+
     // Citizen
     Route::group(['prefix' => '/citizens',], function () {
         Route::get('/add', 'CitizenController@AddGet');
         Route::post('/add', 'CitizenController@AddPost');
-        Route::get('/edit/{id}', 'CitizenController@EditGet');
+        Route::get('/{citizen_id}/edit', 'CitizenController@EditGet');
         Route::post('/edit', 'CitizenController@EditPost');
-        Route::get('/delete/{id}', 'CitizenController@DeleteGet');
+        Route::get('/{citizen_id}/delete', 'CitizenController@DeleteGet');
         Route::get('/{id}/transactions', 'CitizenController@getCitizenTransactions');
         Route::get('/{id}/deliveries', 'CitizenController@getCitizenDeliveries');
         Route::get('/{citizen_id}/deliveries/{delivery_id}', 'CitizenController@getCitizenDeliveryItems');
@@ -111,9 +125,9 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
     Route::group(['prefix' => '/systems',], function () {
         Route::get('/add', 'SystemController@AddGet');
         Route::post('/add', 'SystemController@AddPost');
-        Route::get('/edit/{id}', 'SystemController@EditGet');
+        Route::get('/{system_id}/edit', 'SystemController@EditGet');
         Route::post('/edit', 'SystemController@EditPost');
-        Route::get('/delete/{id}', 'SystemController@DeleteGet');
+        Route::get('/{system_id}/delete', 'SystemController@DeleteGet');
         Route::get('/', 'SystemController@getAllForAdmin');
     });
 

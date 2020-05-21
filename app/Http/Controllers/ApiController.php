@@ -526,7 +526,7 @@ class ApiController extends Controller
 
     function getInformations(Request $request)
     {
-        $result = Information::all();
+        $result = Information::where('for', 'android_app')->get();
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
     }
 

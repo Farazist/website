@@ -13,9 +13,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="application-name" content="Farazist">
     <meta name="author" content="Sajjad Aemmi">
-    <meta name="description" content="@yield('description', '')">
-    <meta name="keywords"
-        content="@yield('keywords','بازیافت,بازیافت هوشمند,تحویل پسماند,شارژ ساختمان,بیمه,خیریه,ECO,RVM,شارژ سیم کارت,پرداخت قبض,تحویل پکیج')">
+    <meta name="description" content="@yield('description', $description->value)">
+    <meta name="keywords" content="@yield('keywords', $keywords->value)">
 
     <meta property="og:title" content="فرازیست" />
     <meta property="og:url" content="@yield('url','https://farazist.ir')" />
@@ -84,6 +83,26 @@
 </head>
 
 <body class="bg-light">
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+       <div class="modal-dialog modal-sm" role="document">
+           <div class="modal-content">
+               <div class="modal-body">
+                   <p class="mb-0">آیا برای حذف اطمینان دارید؟</p>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">برگشت</button>
+                   <a href="#" class="btn-danger btn" id="btn-delete">
+                       حذف
+                   </a>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   
     <div class="preloader_wrapper">
         <div class="preloader_inner">
             <img src="{{ url('/images/logo.png') }}" width="64px" alt="farazist logo" />
@@ -98,6 +117,21 @@
         <main class="col p-0 position-relative w-25">
 
             @include('includes.header')
+   
+            @if(Session::has('message'))
+            <div class="row pt-3 pb-0">
+                <div class="col-12">
+                    <div class="alert alert-info mb-0" role="alert">
+                        {{Session::get('message')}}
+                        
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            @endif
+            
             @yield('content')
             @include('includes.footer')
         </main>
@@ -132,10 +166,10 @@
 
     <script>
         ClassicEditor
-            .create( document.querySelector( '#editor' ) )
-            .catch( error => {
-                console.error( error );
-            } );
+            .create(document.querySelector('#editor'))
+            .catch(error => {
+                console.error(error);
+            });
     </script>
 </body>
 

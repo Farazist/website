@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Delivery;
+use App\City;
+use App\Province;
+use App\System;
 use App\User;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
@@ -21,6 +24,11 @@ class CitizenController extends Controller
 	{
 		$citizens = User::where('role', '3')->get();
 
+		foreach ($citizens as $citizen) {
+
+            $citizen->created_date = jdate('Y/m/j', strtotime($citizen->created_at));
+		}
+		
 		return view('admin.citizens', [
 			'citizens' => $citizens,
 		]);
@@ -59,5 +67,61 @@ class CitizenController extends Controller
     {
         Auth::logout();
         return redirect('/');
-    }
+	}
+	
+	public function EditGet($citizen_id)
+	{
+		$citizen = User::find($citizen_id);
+		$provinces = Province::all();
+		$cities = City::all();
+		$systems = System::all();
+
+		if (!$citizen) {
+            return redirect()->back()->with([
+				'message' => 'شهروند پیدا نشد',
+			]);
+		}
+
+		return view('admin.citizen_form', [
+			'citizen' => $citizen,
+			'provinces' => $provinces,
+			'cities' => $cities,
+			'systems' => $systems,
+		]);
+	}
+
+	public function EditPost(Request $request)
+	{
+        $this->validate($request,[
+            'name' => 'required|max:120',
+        ]);
+
+        $citizen = User::find($request['id']);
+        $citizen->name = $request['name'];
+        $citizen->city_id = $request['city_id'];
+        $citizen->address = $request['address'];
+        $citizen->role = $request['role'];
+        $citizen->system_id = $request['system_id'];
+        $citizen->image = $request['image'];
+        $citizen->wallet = $request['wallet'];
+        $citizen->update();
+
+        return redirect('admin/citizens')->with([
+			'message' => 'شهروند ویرایش شد',
+		]);
+	}
+
+	public function DeleteGet($citizen_id)
+	{
+		$citizen = User::find($citizen_id);
+		if (!$citizen) {
+            return redirect()->back()->with([
+				'message' => 'شهروند پیدا نشد',
+			]);
+		}
+		$citizen->delete();
+		return redirect()->back()->with([
+			'message' => 'شهروند با موفقیت حذف گردید',
+		]);
+	}
 }
