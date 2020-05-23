@@ -42,8 +42,8 @@
                                 <div class="form-group col-md-4">
                                     <label for="name">استان</label>
                                     <select class="form-control">
+                                        <option value="-1"> </option>
                                         @foreach($provinces as $province)
-                                            <option value="-1"> </option>
                                             <option value="{{$province->id}}" {{ (isset($owner) && isset($owner->city) && $owner->city->province_id == $province->id ? 'selected' : '') }}>
                                                 {{$province->name}}
                                             </option>
@@ -53,8 +53,8 @@
                                 <div class="form-group col-md-4">
                                     <label for="name">شهر</label>
                                     <select class="form-control" name="city_id">
+                                        <option value="-1"> </option>
                                         @foreach($cities as $city)
-                                            <option value="-1"> </option>
                                             <option value="{{$city->id}}" {{Request::old('city_id') && Request::old('city_id') == $city->id ? 'selected' : (isset($owner) && $owner->city_id == $city->id ? 'selected' : '') }}>
                                                 {{$city->name}}
                                             </option>
@@ -87,8 +87,8 @@
                                 <div class="form-group col-md-4">
                                     <label for="name">دستگاه متصل</label>
                                     <select class="form-control" name="system_id">
-                                        @foreach($systems as $system)
                                         <option value="-1"> </option>
+                                        @foreach($systems as $system)
                                             <option value="{{$system->id}}" {{Request::old('system_id') && Request::old('system_id') == $system->id ? 'selected' : (isset($owner) && $owner->system_id == $system->id ? 'selected' : '') }}>
                                                 {{$system->name}}
                                             </option>

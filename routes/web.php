@@ -175,9 +175,9 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
     Route::group(['prefix' => '/employees',], function () {
         Route::get('/add', 'EmployeeController@AddGet');
         Route::post('/add', 'EmployeeController@AddPost');
-        Route::get('/edit/{id}', 'EmployeeController@EditGet');
+        Route::get('/{employee_id}/edit', 'EmployeeController@EditGet');
         Route::post('/edit', 'EmployeeController@EditPost');
-        Route::get('/delete/{id}', 'EmployeeController@DeleteGet');
+        Route::get('/{employee_id}/delete', 'EmployeeController@DeleteGet');
         Route::get('/', 'EmployeeController@getAllForAdmin');
     });
 

@@ -64,8 +64,8 @@ class EmployeeController extends Controller
         $employee->image = $request['image'];
         $employee->save();
 
-        return redirect('/admin/employee')->with([
-            'message' => 'کارمند افزوده شد',
+        return redirect('/admin/employees')->with([
+            'message' => 'همکار افزوده شد',
         ]);
     }
 
@@ -75,7 +75,7 @@ class EmployeeController extends Controller
 
         if (!$employee) {
             return redirect('/admin/employee')->with([
-                'message' => 'کارمند پیدا نشد',
+                'message' => 'همکار پیدا نشد',
             ]);
         }
 
@@ -102,8 +102,8 @@ class EmployeeController extends Controller
 
         $employee->update();
 
-        return redirect('/admin/employee')->with([
-            'message' => 'کارمند ویرایش شد',
+        return redirect('/admin/employees')->with([
+            'message' => 'همکار ویرایش شد',
         ]);
     }
 
@@ -112,15 +112,15 @@ class EmployeeController extends Controller
         $employee = Employee::find($topic_id);
 
         if (!$employee) {
-            return redirect('/admin/employee')->with([
-                'message' => 'کارمند پیدا نشد',
+            return redirect()->back()->with([
+                'message' => 'همکار پیدا نشد',
             ]);
         }
 
         $employee->delete();
 
         return redirect()->back()->with([
-            'message' => 'کارمند حذف شد',
+            'message' => 'همکار حذف شد',
         ]);
     }
 }

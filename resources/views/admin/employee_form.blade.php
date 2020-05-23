@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-<div class="row pt-3 mb-4 pb-5">
+<div class="row pt-3 mb-5 pb-5">
     <div class="col">
         <div class="card shadow rounded-lg border-0">
             <div class="card-header bg-transparent border-0">
@@ -15,7 +15,7 @@
                 <button type="submit" class="btn btn-success float-left" form="form">ذخیره</button>
             </div>
             <div class="card-body">
-                <form method="post" action="{{ URL::asset("/admin/employee") }}/{{ isset($employee) ? 'edit' : 'add' }}"
+                <form method="post" action="{{ URL::asset("/admin/employees") }}/{{ isset($employee) ? 'edit' : 'add' }}"
                     enctype="multipart/form-data" id="form">
                     <div class="row">
                         <div class="col-md-10">

@@ -131,6 +131,7 @@ class ApiController extends Controller
                 return response()->json($user, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
             }
         }
+        return 0;
     }
 
     function getTargetUser(Request $request)

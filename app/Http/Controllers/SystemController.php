@@ -72,6 +72,7 @@ class SystemController extends Controller
             'morning_end_time' => 'numeric|nullable',
             'afternoon_start_time' => 'numeric|nullable',
             'afternoon_end_time' => 'numeric|nullable',
+            'address' => 'required',
         ]);
 
         $system = new System();
@@ -126,6 +127,7 @@ class SystemController extends Controller
             'morning_end_time' => 'numeric|nullable',
             'afternoon_start_time' => 'numeric|nullable',
             'afternoon_end_time' => 'numeric|nullable',
+            'address' => 'required',
         ]);
 
         $system = System::find($request['id']);
