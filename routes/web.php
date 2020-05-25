@@ -129,6 +129,27 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
         Route::post('/edit', 'SystemController@EditPost');
         Route::get('/{system_id}/delete', 'SystemController@DeleteGet');
         Route::get('/', 'SystemController@getAllForAdmin');
+
+        // Slider
+        Route::group(['prefix' => '/{system_id}/sliders'], function () {
+            Route::get('/add', 'SliderController@AddGet');
+            Route::post('/add', 'SliderController@AddPost');
+            Route::get('/{slider_id}/edit', 'SliderController@EditGet');
+            Route::post('/edit', 'SliderController@EditPost');
+            Route::get('/{slider_id}/delete', 'SliderController@DeleteGet');
+            Route::get('/', 'SliderController@getBySystem');
+        });
+    });
+
+    // Ticket
+    Route::group(['prefix' => '/tickets',], function () {
+        Route::get('/add', 'TicketController@AddGet');
+        Route::post('/add', 'TicketController@AddPost');
+        Route::get('/{ticket_id}/edit', 'TicketController@EditGet');
+        Route::post('/edit', 'TicketController@EditPost');
+        Route::get('/{ticket_id}/delete', 'TicketController@DeleteGet');
+        Route::get('/{ticket_id}/messages', 'TicketController@getMessages');
+        Route::get('/', 'TicketController@getAll');
     });
 
     // FAQ

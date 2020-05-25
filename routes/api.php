@@ -56,8 +56,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/add-ticket-message', 'ApiController@addTicketMessage');
     Route::post('/edit-ticket-messages', 'ApiController@editTicketMessages');
     Route::post('/get-new-ticket-messages-count', 'ApiController@getNewTicketMessagesCount');
+    Route::post('/add-money-request', 'ApiController@addMoneyRequest');
+    Route::post('/edit-money-request', 'ApiController@editMoneyRequest');
+    Route::post('/get-last-user-money-request', 'ApiController@getLastUserMoneyRequest');
     Route::post('/transfer', 'ApiController@transfer');
-    Route::post('/transfer-secure', 'ApiController@transferSecure');
     Route::post('/get-faqs', 'ApiController@getFaqs');
     Route::post('/edit-items', 'ApiController@editItems');
     Route::post('/get-informations', 'ApiController@getInformations');

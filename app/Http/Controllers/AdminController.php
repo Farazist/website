@@ -8,6 +8,7 @@ use App\Level;
 use App\Transaction;
 use App\User;
 use App\Delivery;
+use App\Ticket;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -60,7 +61,10 @@ class AdminController extends Controller
 
     function Index()
     {
-        return view('admin.index');
+        $tickets = Ticket::orderBy('created_at', 'desc')->take(4)->get();
+        return view('admin.index')->with([
+            'tickets' => $tickets
+        ]);
     }
 
     function getAddAdmin()

@@ -16,6 +16,10 @@
                 <p>
 
                 </p>
+                <a href="#download-app" id="download-app" class="btn btn-lg btn-success rounded-pill">
+                    <span class="fab fa-android"></span>
+                    دانلود فرازیست
+                </a>
             </div>
         </div>
     </div>
@@ -140,7 +144,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-3 px-5">
-                <img src="{{ url('/images/mobile.png') }}" class="img-fluid">
+                <img src="{{ url('/images/farazist-android-app.png') }}" class="img-fluid">
             </div>
             <div class="col-md-9">
                 <div class="clv_heading text-right">
@@ -152,14 +156,14 @@
                     اپلیکیشن فرازیست هم اکنون بر روی سیستم عامل‌ android در دسترس است و می‌توانید با مراجعه به
                     لینک‌های زیر، آن را دریافت نمایید.
                 </p>
-                <a href="https://cafebazaar.ir/app/com.mofid.bambo" class="m-2" target="_blank">
+                <a href="https://cafebazaar.ir/app/ir.farazist.farazist_app" class="m-2" target="_blank">
                     <img alt="App Store" src="{{ url('/images/bazaar.png') }}" width="150">
                 </a>
                 <a href="#" class="m-2">
                     <img alt="App Store" src="{{ url('/images/google-play.svg') }}" width="150">
                 </a>
                 <br>
-                <a href="#" download class="btn btn-success btn-lg rounded-pill m-2 mt-4">
+                <a href="{{ url("/files/farazist.apk") }}" download class="btn btn-success btn-lg rounded-pill m-2 mt-4">
                     <span class="fab fa-android"></span>
                     دانلود مستقیم اپلیکیشن
                 </a>

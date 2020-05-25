@@ -8,12 +8,10 @@
 
     <a href="{{ url("/") }}" class="navbar-brand">
         <img src="{{ url('/images/logo.png') }}" height="40px" alt="farazist logo" />
+        فرازیست
     </a>
     <div class="order-md-2 order-1">
-        <a href="#download-app" id="download-app" class="btn btn-success rounded-pill d-md-inline d-sm-block">
-            <span class="fab fa-android"></span>
-            دانلود فرازیست
-        </a>
+        
         <a>
             <i class="fad fa-search pr-3" id="search_toggle" aria-hidden="true"></i>
         </a>

@@ -13,6 +13,11 @@ class Ticket extends Model
 
 	public function group()
 	{
-		return $this->belongsTo('App\TicketGroup');
+		return $this->belongsTo('App\TicketGroup')->withDefault();
+	}
+	
+	public function user()
+	{
+		return $this->belongsTo('App\User')->withDefault();
 	}
 }

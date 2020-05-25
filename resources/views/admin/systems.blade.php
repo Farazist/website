@@ -34,6 +34,7 @@
                                 <th scope="col">مالک </th>
                                 <th scope="col">وضعیت </th>
                                 <th scope="col"></th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody id="myTable">
@@ -54,7 +55,13 @@
                                     <span class="fad fa-circle fa-2x text-secondary fa-fw"></span>
                                     @endif
                                 </td>
-
+                                <td class="align-middle fit">
+                                    <a href="{{ url("/admin/systems/$system->id/sliders") }}"
+                                        class="btn-outline-success btn btn-sm">
+                                        اسلایدر
+                                        <span class="fad fa-images fa-fw"></span>
+                                    </a>
+                                </td>
                                 <td class="align-middle fit">
                                     <a href="{{ URL::asset("/admin/systems/$system->id/edit") }}"
                                         class="btn-outline-info btn btn-sm">

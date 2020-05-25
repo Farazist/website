@@ -19,6 +19,7 @@ use App\Ticket;
 use App\TicketGroup;
 use App\TicketMessage;
 use App\AndroidAppVersion;
+use App\MoneyRequest;
 use SoapClient;
 use SoapFault;
 use Illuminate\Support\Facades\DB;
@@ -266,6 +267,11 @@ class ApiController extends Controller
             $user->email = $request['email'];            
         }
 
+        if ($request->has('card_number')) 
+        {
+            $user->card_number = $request['card_number'];            
+        }
+
         if ($request->has('password')) 
         {
             $user->password = bcrypt($request['password']);
@@ -453,6 +459,38 @@ class ApiController extends Controller
         {
             $result += $ticket->messages()->where('type','receive')->where('state','unseen')->count();
         }
+        return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+    }
+
+    function addMoneyRequest(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+
+        $money_request = new MoneyRequest();
+        $money_request->amount = $request['amount'];
+        $money_request->user_id = $user->id;
+        $money_request->save();
+        return 1;
+    }
+
+    function editMoneyRequest(Request $request)
+    {
+        $money_request = MoneyRequest::find($request['money_request_id']);
+
+        if ($request->has('amount')) 
+            $money_request->amount = $request['amount'];
+
+        if ($request->has('state')) 
+            $money_request->state = $request['state'];
+
+        $money_request->update();
+        return 1;
+    }
+    
+    function getLastUserMoneyRequest(Request $request)
+    {
+        $user = auth()->guard('api')->user();
+        $result = $user->money_requests->orderBy('created_at', 'DESC')->first();
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 

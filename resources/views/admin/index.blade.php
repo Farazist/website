@@ -6,8 +6,39 @@
 
 @section('content')
 <div class="row pt-3 mb-4 pb-5">
-    <div class="col-md-6">
-        <div class="card bg-white mb-3 shadow rounded-lg">
+    <div class="col-md-6 mb-3">
+        <div class="card bg-white shadow rounded-lg h-100">
+            <div class="card-header bg-success text-white">
+                آخرین تیکت ها
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-bordered table-hover small mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" width="64px"></th>
+                            <th scope="col">نام کاربر</th>
+                            <th scope="col">موضوع</th>
+                            <th scope="col">بخش</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myTable">
+                        @foreach($tickets as $ticket)
+                        <tr>
+                            <td>
+                                <img class="img-fluid rounded-circle" src="{{ URL::asset($ticket->user->image) }}">
+                            </td>
+                            <th class="align-middle" scope="row">{{$ticket->user->name}}</th>
+                            <td class="align-middle">{{$ticket->subject}}</td>
+                            <td class="align-middle">{{$ticket->group->title}}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card bg-white shadow rounded-lg h-100">
             <div class="card-header bg-success text-white">
                 تعداد تراکنش ها در هر ماه میلادی
             </div>
@@ -16,8 +47,8 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card bg-white mb-3 shadow rounded-lg">
+    <div class="col-md-6 mb-3">
+        <div class="card bg-white shadow rounded-lg h-100">
             <div class="card-header bg-success text-white">
                 تعداد تحویل ها در هر ماه میلادی
             </div>
@@ -26,8 +57,8 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card bg-white mb-3 shadow rounded-lg">
+    <div class="col-md-6 mb-3">
+        <div class="card bg-white shadow rounded-lg h-100">
             <div class="card-header bg-success text-white">
                 تعداد کاربران جدید در هر ماه میلادی
             </div>
