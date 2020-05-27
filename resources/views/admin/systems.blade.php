@@ -56,6 +56,11 @@
                                     @endif
                                 </td>
                                 <td class="align-middle fit">
+                                    <a href="{{ url("/admin/systems/$system->id/citizens") }}"
+                                        class="btn-outline-success btn btn-sm">
+                                        شهروندان
+                                        <span class="fad fa-users fa-fw"></span>
+                                    </a>
                                     <a href="{{ url("/admin/systems/$system->id/sliders") }}"
                                         class="btn-outline-success btn btn-sm">
                                         اسلایدر

@@ -34,6 +34,17 @@ class CitizenController extends Controller
 		]);
     }
 
+	public function getBySystem($system_id)
+    {
+        $system = System::find($system_id);
+        $citizens = $system->citizens;
+
+        return view('admin.citizens', [
+            'system' => $system,
+            'citizens' => $citizens,
+        ]);
+	}
+	
     public function getCitizenTransactions($id)
 	{
 		$citizen = User::find($id);

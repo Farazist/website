@@ -128,6 +128,7 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
         Route::get('/{system_id}/edit', 'SystemController@EditGet');
         Route::post('/edit', 'SystemController@EditPost');
         Route::get('/{system_id}/delete', 'SystemController@DeleteGet');
+        Route::get('/{system_id}/citizens', 'CitizenController@getBySystem');
         Route::get('/', 'SystemController@getAllForAdmin');
 
         // Slider

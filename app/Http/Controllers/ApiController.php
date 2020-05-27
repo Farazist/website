@@ -482,7 +482,10 @@ class ApiController extends Controller
 
         if ($request->has('state')) 
             $money_request->state = $request['state'];
-
+        
+        if ($request->has('description')) 
+            $money_request->description = $request['description'];
+        
         $money_request->update();
         return 1;
     }
@@ -490,8 +493,8 @@ class ApiController extends Controller
     function getLastUserMoneyRequest(Request $request)
     {
         $user = auth()->guard('api')->user();
-        $result = $user->money_requests->orderBy('created_at', 'DESC')->first();
-        return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+        $result = $user->money_requests()->orderBy('created_at', 'DESC')->first();
+        return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);    
     }
 
     function transfer(Request $request)
