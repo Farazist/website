@@ -36,6 +36,7 @@ class ApiController extends Controller
         return response()->json($result, 200, ['Content-type'=> 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE); 
     }
 
+    
     function socket()
     {
         echo 'connect';
