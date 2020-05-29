@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="application-name" content="Farazist">
-    <meta name="author" content="Sajjad Aemmi">
+    <meta name="author" content="Sajjad Aemmi, Emad Aemi">
     <meta name="description" content="@yield('description', $description->value)">
     <meta name="keywords" content="@yield('keywords', $keywords->value)">
 
