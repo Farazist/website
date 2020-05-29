@@ -11,7 +11,7 @@
                 <h3 class="card-title d-inline text-success">
                     همکاران
                 </h3>
-                <a href="{{ URL::asset("/admin/partner/add") }}" class="btn btn-success float-left">
+                <a href="{{ URL::asset("/admin/partners/add") }}" class="btn btn-success float-left">
                     <span class="fas fa-plus"></span>
                 </a>
             </div>

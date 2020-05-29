@@ -29,23 +29,23 @@ class FaqController extends Controller
 
     public function AddGet()
     {
-        return view('admin.partner_form');
+
+        return view('admin.faqs_form');
     }
 
     public function AddPost(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|max:120'
+            'question' => 'required'
         ]);
 
-        $partner = new Partner();
-        $partner->name = $request['name'];
-        $partner->url = $request['url'];
-        $partner->image = $request['image'];
-        $partner->save();
+        $faq = new faq();
+        $faq->question = $request['question'];
+        $faq->answer = $request['answer'];
+        $faq->save();
 
-        return redirect('/admin/partner')->with([
-            'message' => 'همکار افزوده شد',
+        return redirect('/admin/faqs')->with([
+            'message' => 'سوال افزوده شد',
         ]);
     }
 
