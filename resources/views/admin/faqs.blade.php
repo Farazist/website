@@ -11,6 +11,9 @@
                 <h3 class="card-title d-inline text-success">
                     پرسش های متداول
                 </h3>
+                <a href="{{ URL::asset("/admin/faqs/add") }}" class="btn btn-success float-left">
+                    <span class="fas fa-plus"></span>
+                </a>
             </div>
             <div class="card-body">
                 @if(count($faqs) == 0)
