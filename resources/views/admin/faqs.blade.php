@@ -33,7 +33,7 @@
                                 <td class="align-middle">{{$faq->question}}</td>
 
                                 <td class="align-middle text-left">
-                                    <a href="{{ URL::asset("/admin/faq/edit/$faq->id") }}"
+                                    <a href="{{ url("/admin/faqs/$faq->id/edit") }}"
                                         class="btn-outline-info btn btn-sm">
                                         <span class="fas fa-pen fa-fw"></span>
                                     </a>

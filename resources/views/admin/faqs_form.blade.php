@@ -33,7 +33,7 @@
                                 </div>
                             </div>
                         </div>
-                        <input name="id" type="hidden" value="{{ isset($partner) ? $partner->id : '' }}">
+                        <input name="id" type="hidden" value="{{ isset($faq) ? $faq->id : '' }}">
                         <input name="_token" type="hidden" value="{{ csrf_token() }}">
                     </form>
                 </div>

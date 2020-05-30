@@ -49,35 +49,35 @@ class FaqController extends Controller
         ]);
     }
 
-    public function EditGet($partner_id)
+    public function EditGet($faq_id)
     {
-        $partner = Partner::find($partner_id);
+        $faq = Faq::find($faq_id);
         
-        if (!$partner) {
-            return redirect()->route('admin.partner.all.get')->with([
-                'message' => 'همکار پیدا نشد',
+        if (!$faq) {
+            return redirect()->back()->with([
+                'message' => 'سوال پیدا نشد',
             ]);
         }
 
-        return view('admin.partner_form', [
-            'partner' => $partner,
+        return view('admin.faqs_form', [
+            'faq' => $faq,
         ]);
     }
 
     public function EditPost(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|max:120'
+            'question' => 'required',
+            'answer' => 'required'
         ]);
 
-        $partner = Partner::find($request['id']);
-        $partner->name = $request['name'];
-        $partner->url = $request['url'];
-        $partner->image = $request['image'];
-        $partner->update();
+        $faq = Faq::find($request['id']);
+        $faq->question = $request['question'];
+        $faq->answer = $request['answer'];
+        $faq->update();
 
-        return redirect('/admin/partner')->with([
-            'message' => 'همکار ویرایش شد',
+        return redirect('/admin/faqs')->with([
+            'message' => 'سوال ویرایش شد',
         ]);
     }
 
