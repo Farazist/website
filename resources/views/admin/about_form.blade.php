@@ -15,7 +15,7 @@
                 <button type="submit" class="btn btn-success float-left" form="form">ذخیره</button>
             </div>
             <div class="card-body">
-                <form method="post" action="{{ URL::asset("/admin/about") }}/{{isset($about) ? 'edit' : 'add'}}"
+                <form method="post" action="{{ URL::asset("/admin/abouts") }}/{{isset($about) ? 'edit' : 'add'}}"
                     enctype="multipart/form-data" id="form">
                     <div class="row">
                         <div class="col-md-10">
@@ -29,8 +29,9 @@
                                 <label class="pb-2">
                                     توضیح
                                 </label>
-                                <textarea name="caption" id="editor"
-                                    class="form-control">{{Request::old('caption') ? Request::old('caption') : (isset($about) ? $about->caption : '') }}</textarea>
+                                <input name="caption" id="caption" type="text" required
+                                    class="form-control {{$errors->has('caption') ? 'is-invalid' : ''}}"
+                                    value="{{Request::old('caption') ? Request::old('caption') : (isset($about) ? $about->caption : '') }}">
                             </div>
                         </div>
                         <div class="col-md-2">

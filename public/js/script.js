@@ -22,6 +22,14 @@ $(document).ready(function () {
     $('#ckf').click(function() {
         selectFileWithCKFinder('img-address', 'img-preview');
     });
+
+
+    $("#myInput").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("#myTable tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
 })
 
 // ckfinder

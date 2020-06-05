@@ -72,7 +72,7 @@ class AboutController extends Controller
     {
         $about = About::find($about_id);
         if (!$about) {
-            return redirect()->route('admin.about.all.get')->with([
+            return redirect()->back()->with([
                 'message' => 'امکانات پیدا نشد',
             ]);
         }
@@ -95,7 +95,7 @@ class AboutController extends Controller
         $about->image = $request['image'];
         $about->update();
 
-        return redirect('/admin/about')->with([
+        return redirect('/admin/abouts')->with([
             'message' => 'امکانات ویرایش شد',
         ]);
     }

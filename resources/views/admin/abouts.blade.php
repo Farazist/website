@@ -36,7 +36,7 @@
                                 <td class="align-middle">{{$about->caption}}</td>
 
                                 <td class="align-middle text-left">
-                                    <a href="{{ URL::asset("/admin/about/edit/$about->id") }}"
+                                    <a href="{{ URL::asset("/admin/abouts/edit/$about->id") }}"
                                         class="btn-outline-info btn btn-sm">
                                         <span class="fas fa-pen fa-fw"></span>
                                     </a>
