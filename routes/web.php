@@ -157,7 +157,7 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
     Route::group(['prefix' => '/faqs',], function () {
         Route::get('/add', 'FaqController@AddGet');
         Route::post('/add', 'FaqController@AddPost');
-        Route::get('/edit/{id}', 'FaqController@EditGet');
+        Route::get('/{faq_id}/edit', 'FaqController@EditGet');
         Route::post('/edit', 'FaqController@EditPost');
         Route::get('/delete/{id}', 'FaqController@DeleteGet');
         Route::get('/', 'FaqController@getAllForAdmin');
