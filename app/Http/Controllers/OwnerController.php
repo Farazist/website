@@ -7,6 +7,7 @@ use App\City;
 use App\Province;
 use App\System;
 use App\User;
+use App\Item;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -50,6 +51,17 @@ class OwnerController extends Controller
 		return view('admin.deliveries', [
 			'owner' => $owner,
 		]);
+    }
+
+    public function getOwnerItems($id)
+    {
+        $owner = User::find($id);
+        $items = Item::where('owner_id', $id )->get();
+
+        return view('admin.owner_items', [
+            'owner' => $owner,
+            'items' => $items,
+        ]);
     }
 
     public function getOwnerDeliveryItems($owner_id, $delivery_id)

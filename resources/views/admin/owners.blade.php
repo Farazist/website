@@ -56,9 +56,9 @@
                                         تراکنش ها
                                         <span class="fad fa-exchange fa-fw"></span>
                                     </a>
-                                    <a href="{{ url("/admin/owners/$owner->id/deliveries") }}"
+                                    <a href="{{ url("/admin/owners/$owner->id/items") }}"
                                         class="btn-outline-success btn btn-sm">
-                                        تحویل ها
+                                        آیتم ها
                                         <span class="fad fa-recycle fa-fw"></span>
                                     </a>
                                 </td>
