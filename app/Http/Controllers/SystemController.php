@@ -85,10 +85,22 @@ class SystemController extends Controller
         $system->state = $request['state'];
         $system->lat = $request['lat'];
         $system->lng = $request['lng'];
-        $system->morning_start_time = $request['morning_start_time'];
-        $system->morning_end_time = $request['morning_end_time'];
-        $system->afternoon_start_time = $request['afternoon_start_time'];
-        $system->afternoon_end_time = $request['afternoon_end_time'];
+        if($request['morning_start_time'] != NULL )
+        {
+            $system->morning_start_time = $request['morning_start_time'];
+        }
+        if($request['morning_end_time'] != NULL )
+        {
+            $system->morning_end_time = $request['morning_end_time'];
+        }
+        if($request['afternoon_start_time'] != NULL )
+        {
+            $system->afternoon_start_time = $request['afternoon_start_time'];
+        }
+        if($request['afternoon_end_time'] != NULL )
+        {
+            $system->afternoon_end_time = $request['afternoon_end_time'];
+        }
         $system->image = $request['image'];
         $system->save();
 
@@ -139,10 +151,22 @@ class SystemController extends Controller
         $system->state = $request['state'];
         $system->lat = $request['lat'];
         $system->lng = $request['lng'];
-        $system->morning_start_time = $request['morning_start_time'];
-        $system->morning_end_time = $request['morning_end_time'];
-        $system->afternoon_start_time = $request['afternoon_start_time'];
-        $system->afternoon_end_time = $request['afternoon_end_time'];
+        if($request['morning_start_time'] != NULL )
+        {
+            $system->morning_start_time = $request['morning_start_time'];
+        }
+        if($request['morning_end_time'] != NULL )
+        {
+            $system->morning_end_time = $request['morning_end_time'];
+        }
+        if($request['afternoon_start_time'] != NULL )
+        {
+            $system->afternoon_start_time = $request['afternoon_start_time'];
+        }
+        if($request['afternoon_end_time'] != NULL )
+        {
+            $system->afternoon_end_time = $request['afternoon_end_time'];
+        }
         $system->image = $request['image'];
         $system->update();
 
