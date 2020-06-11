@@ -20,7 +20,7 @@ class AppController extends Controller
         if($request->file('app') != null)
         {
             $app = $request->file('app');
-            $app_name = '/files/Farazist.apk';
+            $app_name = '/files/farazist.apk';
             Storage::disk('public')->putFileAs('/', $app, $app_name);
         }
 
