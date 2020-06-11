@@ -224,6 +224,12 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
         Route::get('/', 'PartnerController@getAllForAdmin');
     });
 
+    // App
+    Route::group(['prefix' => '/app',], function () {
+        Route::post('/add', 'AppController@AddApp');
+        Route::get('/', 'AppController@getAllForAdmin');
+    });
+
     Route::get('/signout', 'AdminController@SignOut');
 
 });
