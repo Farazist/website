@@ -41,7 +41,7 @@
                             @foreach($systems as $system)
                             <tr>
                                 <td>
-                                    <img class="img-fluid rounded" src="{{ URL::asset("$system->image") }}">
+                                    <img loading="lazy" class="img-fluid rounded" src="{{ URL::asset("$system->image") }}">
                                 </td>
                                 <td class="align-middle">{{$system->name}}</td>
                                 <td class="align-middle">{{$system->id}}</td>

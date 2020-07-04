@@ -37,7 +37,7 @@
                             <tr>
                                 <td>
                                     @if($owner->image)
-                                    <img src="{{ $owner->image }}" class="img-fluid rounded-circle" alt="...">
+                                    <img loading="lazy" src="{{ $owner->image }}" class="img-fluid rounded-circle" alt="...">
                                     @else
                                     <span class="fad fa-user fa-3x text-success fa-fw"></span>
                                     @endif

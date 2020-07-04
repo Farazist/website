@@ -34,7 +34,7 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="garden_service_block">
                         <div class="service_image">
-                            <span><img src="{{ url("$about->image") }}" alt="image" class="img-fluid w-75" /></span>
+                            <span><img loading="lazy" src="{{ url("$about->image") }}" alt="image" class="img-fluid w-75" /></span>
                         </div>
                         <h3>{{ $about->title }}</h3>
                         <p>{{ $about->caption }}</p>
@@ -47,7 +47,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="garden_about_image">
-                        <img src="images/RVM.jpg" class="img-fluid" alt="image" />
+                        <img loading="lazy" src="images/RVM.jpg" class="img-fluid" alt="image" />
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -111,7 +111,7 @@
             <div class="col-lg-6 col-md-6">
                 <div class="clv_heading">
                     <h3>امکانات فرازیست</h3>
-                    <div class="clv_underline"><img src="images/garden_underline.png" alt="image" /></div>
+                    <div class="clv_underline"><img loading="lazy" src="images/garden_underline.png" alt="image" /></div>
                     <p>کارهایی که می تونی انجام بدی</p>
                 </div>
             </div>
@@ -122,7 +122,7 @@
                 <div class="col-md-4">
                     <div class="service2_block">
                         <div class="service2_image">
-                            <img class="img-fluid w-25" src="{{ url("$service->image") }}" alt="image" />
+                            <img loading="lazy" class="img-fluid w-25" src="{{ url("$service->image") }}" alt="image" />
                         </div>
                         <div class="service2_content">
                             <h3>
@@ -144,7 +144,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-3 px-5">
-                <img src="{{ url('/images/farazist-android-app.png') }}" class="img-fluid">
+                <img loading="lazy" src="{{ url('/images/farazist-android-app.png') }}" class="img-fluid">
             </div>
             <div class="col-md-9">
                 <div class="clv_heading text-right">
@@ -157,10 +157,10 @@
                     لینک‌های زیر، آن را دریافت نمایید.
                 </p>
                 <a href="https://cafebazaar.ir/app/ir.farazist.farazist_app" class="m-2" target="_blank">
-                    <img alt="App Store" src="{{ url('/images/bazaar.png') }}" width="150">
+                    <img loading="lazy" alt="App Store" src="{{ url('/images/bazaar.png') }}" width="150">
                 </a>
                 <a href="#" class="m-2">
-                    <img alt="App Store" src="{{ url('/images/google-play.svg') }}" width="150">
+                    <img loading="lazy" alt="App Store" src="{{ url('/images/google-play.svg') }}" width="150">
                 </a>
                 <br>
                 <a href="{{ url("/files/farazist.apk") }}" download class="btn btn-success btn-lg rounded-pill m-2 mt-4">
@@ -178,7 +178,7 @@
             <div class="col-lg-6 col-md-6">
                 <div class="clv_heading white_heading">
                     <h3>تازه چه خبر؟!</h3>
-                    <div class="clv_underline"><img src="images/underline2.png" alt="image" /></div>
+                    <div class="clv_underline"><img loading="lazy" src="images/underline2.png" alt="image" /></div>
                 </div>
             </div>
         </div>
@@ -192,7 +192,7 @@
                                 <div class="col-lg-6 col-md-6">
                                     <div class="right_blog_block">
                                         <div class="right_blog_image">
-                                            <img src="{{ url("$topic->image") }}" alt="image" />
+                                            <img loading="lazy" src="{{ url("$topic->image") }}" alt="image" />
                                         </div>
                                         <div class="right_blog_content">
                                             <span class="text-success">
@@ -230,7 +230,7 @@
             <div class="col-lg-6 col-md-6">
                 <div class="clv_heading">
                     <h3>گالری تصاویر</h3>
-                    <div class="clv_underline"><img src="images/garden_underline.png" alt="image" /></div>
+                    <div class="clv_underline"><img loading="lazy" src="images/garden_underline.png" alt="image" /></div>
                 </div>
             </div>
         </div>
@@ -240,7 +240,7 @@
                     @foreach($images as $image)
                     <div class="project_item garden planting">
                         <div class="project_block">
-                            <div class="project_image"><img src="{{ url("$image->image") }}" alt="image" />
+                            <div class="project_image"><img loading="lazy" src="{{ url("$image->image") }}" alt="image" />
                             </div>
                             <div class="project_overlay">
                                 <h3>{{$image->title}}</h3>
@@ -264,7 +264,7 @@
             <div class="col-lg-6 col-md-6">
                 <div class="clv_heading">
                     <h3 class="text-white">تیم ما</h3>
-                    <div class="clv_underline"><img src="images/underline2.png" alt="image" /></div>
+                    <div class="clv_underline"><img loading="lazy" src="images/underline2.png" alt="image" /></div>
                     <p class="text-white">
                         آدم های خوب با مهارت فراوان
                     </p>
@@ -280,7 +280,7 @@
                             <div class="swiper-slide">
                                 <div class="shop_slide">
                                     <div class="garden_team_block">
-                                        <img src="{{ url("$employee->image") }}" class="img-fluid" alt="image" />
+                                        <img loading="lazy" src="{{ url("$employee->image") }}" class="img-fluid" alt="image" />
                                         <div class="garden_team_overlay">
                                             <h3>{{ $employee->name }}</h3>
                                             <h6>{{ $employee->explanation }}</h6>
@@ -338,7 +338,7 @@
                             <div class="swiper-slide">
                                 <div class="partner_slide">
                                     <div class="partner_image">
-                                        <img src="{{ url("$partner->image") }}" alt="image" class="img-fluid"
+                                        <img loading="lazy" src="{{ url("$partner->image") }}" alt="image" class="img-fluid"
                                             style="height: 64px" />
                                     </div>
                                 </div>

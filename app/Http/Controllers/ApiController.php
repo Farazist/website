@@ -30,6 +30,47 @@ use Illuminate\Contracts\Encryption\DecryptException;
 
 class ApiController extends Controller
 {
+    function encrypt($plaintext)
+    {
+        try 
+        {
+            $key = env('APP_KEY');
+            $ivlen = openssl_cipher_iv_length($cipher="rc2-64-cbc");
+            $iv = openssl_random_pseudo_bytes($ivlen);
+            $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
+            $hmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary=true);
+            $ciphertext = base64_encode( $iv.$hmac.$ciphertext_raw );
+
+            return $ciphertext;
+        } 
+        catch (Exception $e) 
+        {
+            return 0;
+        }
+    }
+
+    function decrypt($ciphertext)
+    {
+        try 
+        {
+            $c = base64_decode($ciphertext);
+            $ivlen = openssl_cipher_iv_length($cipher="rc2-64-cbc");
+            $iv = substr($c, 0, $ivlen);
+            $hmac = substr($c, $ivlen, $sha2len=32);
+            $ciphertext_raw = substr($c, $ivlen+$sha2len);
+            $original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
+            $calcmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary=true);
+            if (hash_equals($hmac, $calcmac))//PHP 5.6+ timing attack safe comparison
+            {
+                return $original_plaintext;
+            }
+        } 
+        catch (Exception $e) 
+        {
+            return 0;
+        }
+    }
+
     function getLastAndroidAppVersion()
     {
         $result = AndroidAppVersion::orderBy('created_at', 'DESC')->first();
@@ -62,7 +103,7 @@ class ApiController extends Controller
         try 
         {
             $user = auth()->guard('api')->user();
-            $decrypted = Crypt::decryptString($request['qrcode_signin_token']);
+            $decrypted = $this->decrypt($request['qrcode_signin_token']);
             $system = System::find($decrypted);
             $system->qrcode_signin_token = $request['qrcode_signin_token'];
             $system->qrcode_signin_user_id = $user->id;
@@ -77,7 +118,7 @@ class ApiController extends Controller
     
     function makeQrcodeSignInToken(Request $request)
     {
-        $encrypted = Crypt::encryptString($request['system_id']);
+        $encrypted = $this->encrypt($request['system_id']);
         return $encrypted;
     }
 
@@ -85,7 +126,7 @@ class ApiController extends Controller
     {
         try 
         {
-            $decrypted = Crypt::decryptString($request['qrcode_signin_token']);
+            $decrypted = $this->decrypt($request['qrcode_signin_token']);
             $system = System::find($decrypted);
     
             if($system->qrcode_signin_token == $request['qrcode_signin_token'])
