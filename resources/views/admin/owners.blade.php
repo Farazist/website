@@ -58,8 +58,8 @@
                                     </a>
                                     <a href="{{ url("/admin/owners/$owner->id/items") }}"
                                         class="btn-outline-success btn btn-sm">
-                                        آیتم ها
-                                        <span class="fad fa-recycle fa-fw"></span>
+                                        پسماندها
+                                        <span class="fad fa-wine-bottle fa-fw"></span>
                                     </a>
                                 </td>
                                 <td class="align-middle fit">

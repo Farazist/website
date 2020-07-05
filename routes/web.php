@@ -102,10 +102,19 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
         Route::get('/{owner_id}/delete', 'OwnerController@DeleteGet');
         Route::get('/{id}/transactions', 'OwnerController@getOwnerTransactions');
         Route::get('/{id}/deliveries', 'OwnerController@getOwnerDeliveries');
-        Route::get('/{id}/items', 'OwnerController@getOwnerItems');
         Route::get('/{owner_id}/deliveries/{delivery_id}', 'OwnerController@getOwnerDeliveryItems');
         Route::get('/{id}', 'OwnerController@SingleGet');
         Route::get('/', 'OwnerController@getAllForAdmin');
+
+        // Item
+        Route::group(['prefix' => '/{owner_id}/items'], function () {
+            Route::get('/add', 'ItemController@AddGet');
+            Route::post('/add', 'ItemController@AddPost');
+            Route::get('/{item_id}/edit', 'ItemController@EditGet');
+            Route::post('/edit', 'ItemController@EditPost');
+            Route::get('/{item_id}/delete', 'ItemController@DeleteGet');
+            Route::get('/', 'ItemController@getByOwner');
+        });
     });
 
     // Citizen

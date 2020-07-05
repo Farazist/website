@@ -53,17 +53,6 @@ class OwnerController extends Controller
 		]);
     }
 
-    public function getOwnerItems($id)
-    {
-        $owner = User::find($id);
-        $items = Item::where('owner_id', $id )->get();
-
-        return view('admin.owner_items', [
-            'owner' => $owner,
-            'items' => $items,
-        ]);
-    }
-
     public function getOwnerDeliveryItems($owner_id, $delivery_id)
 	{
 		$owner = User::find($owner_id);

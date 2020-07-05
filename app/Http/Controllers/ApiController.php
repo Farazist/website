@@ -53,6 +53,7 @@ class ApiController extends Controller
     {
         try 
         {
+            $key = env('APP_KEY');
             $c = base64_decode($ciphertext);
             $ivlen = openssl_cipher_iv_length($cipher="rc2-64-cbc");
             $iv = substr($c, 0, $ivlen);
