@@ -93,6 +93,16 @@ Route::group(['prefix' => '/admin', 'middleware' => 'admin'], function () {
         Route::get('/', 'PageController@AllGetForAdmin');
     });
     
+    // Topic
+    Route::group(['prefix' => '/money-requests',], function () {
+        Route::get('/add', 'MoneyRequestController@AddGet');
+        Route::post('/add', 'MoneyRequestController@AddPost');
+        Route::get('/edit/{id}', 'MoneyRequestController@EditGet');
+        Route::post('/edit', 'MoneyRequestController@EditPost');
+        Route::get('/delete/{id}', 'MoneyRequestController@DeleteGet');
+        Route::get('/', 'MoneyRequestController@getAll');
+    });
+
     // Owner
     Route::group(['prefix' => '/owners',], function () {
         Route::get('/add', 'OwnerController@AddGet');
