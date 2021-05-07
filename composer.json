@@ -14,7 +14,7 @@
         "ckfinder/ckfinder-laravel-package": "v3.5.1.2",
         "fideloper/proxy": "^4.0",
         "intervention/image": "^2.5",
-        "laravel/framework": "6.2",
+        "laravel/framework": "6.18.43",
         "laravel/passport": "^8.4",
         "laravel/socialite": "^4.3",
         "laravel/tinker": "^1.0"
